@@ -17,7 +17,6 @@ public class Comida {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nombre;
-    @NonNull
     private Double precio;
     private String tipo;
     private boolean esVegetariano;
