@@ -2,7 +2,7 @@ package com.ttps.proyecto.service;
 
 import com.ttps.proyecto.dto.request.UsuarioRequestDto;
 import com.ttps.proyecto.exceptions.NotFoundException;
-import com.ttps.proyecto.exceptions.UserAlreadyExistException;
+import com.ttps.proyecto.exceptions.AlreadyExistException;
 import com.ttps.proyecto.model.Usuario;
 import com.ttps.proyecto.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -27,7 +27,7 @@ public class UsuarioService {
     public void registrarUsuario(UsuarioRequestDto usuarioRequestDto) {
 
         if (usuarioRepository.findByEmail(usuarioRequestDto.getEmail()).isPresent()) {
-            throw new UserAlreadyExistException("El email ya se encuentra registrado");
+            throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
 
@@ -42,14 +42,14 @@ public class UsuarioService {
         if (nonNull(usuarioRequestDto.getEmail())
                 && !usuario.getEmail().equals(usuarioRequestDto.getEmail())
                 && usuarioRepository.findByEmail(usuarioRequestDto.getEmail()).isPresent()) {
-            throw new UserAlreadyExistException("El email ya se encuentra registrado");
+            throw new AlreadyExistException("El email ya se encuentra registrado");
         }
 
-        updateUsuario(usuario, usuarioRequestDto);
+        actualizarUsuario(usuario, usuarioRequestDto);
         usuarioRepository.save(usuario);
     }
 
-    private void updateUsuario(Usuario usuario, UsuarioRequestDto usuarioRequestDto) {
+    private void actualizarUsuario(Usuario usuario, UsuarioRequestDto usuarioRequestDto) {
         if (nonNull(usuarioRequestDto.getNombre())) usuario.setNombre(usuarioRequestDto.getNombre());
         if (nonNull(usuarioRequestDto.getApellido())) usuario.setApellido(usuarioRequestDto.getApellido());
         if (nonNull(usuarioRequestDto.getEmail())) usuario.setEmail(usuarioRequestDto.getEmail());

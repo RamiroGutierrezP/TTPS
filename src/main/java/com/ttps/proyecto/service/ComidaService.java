@@ -1,14 +1,19 @@
 package com.ttps.proyecto.service;
 
 import com.ttps.proyecto.dto.request.ComidaRequestDto;
+import com.ttps.proyecto.exceptions.AlreadyExistException;
+import com.ttps.proyecto.exceptions.NotFoundException;
 import com.ttps.proyecto.model.Comida;
 import com.ttps.proyecto.repository.ComidaRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -18,29 +23,41 @@ public class ComidaService {
     @Autowired
     private ComidaRepository comidaRepository;
 
-    public Comida crearComida(ComidaRequestDto comidaRequestDto) {
-        Comida comida = convertToEntity(comidaRequestDto);
-        return comidaRepository.save(comida);
-    }
+    public void crearComida(ComidaRequestDto comidaRequestDto) {
 
-    public Comida actualizarComida(Long id, ComidaRequestDto comidaRequestDto){
-
-//        Comida comida = comidaRepository.findById(id).orElse(null);
-        Comida comida = comidaRepository.getReferenceById(id); //TODO: buscar
-        if (comida == null) {
-            throw new RuntimeException("Comida no encontrada");
+        if (comidaRepository.findByNombre(comidaRequestDto.getNombre()).isPresent()) {
+            throw new AlreadyExistException("Ya existe una comida con ese nombre");
         }
 
-        comida.setNombre(nonNull(comidaRequestDto.getNombre()) ? comidaRequestDto.getNombre() : comida.getNombre());
-        comida.setPrecio(nonNull(comidaRequestDto.getPrecio()) ? comidaRequestDto.getPrecio() : comida.getPrecio());
-        comida.setTipo(nonNull(comidaRequestDto.getTipo()) ? comidaRequestDto.getTipo() : comida.getTipo());
-        comida.setEsVegetariano(nonNull(comidaRequestDto.getEsVegetariano()) ? comidaRequestDto.getEsVegetariano() : comida.isEsVegetariano());
+        Comida comida = convertToEntity(comidaRequestDto);
+        comidaRepository.save(comida);
+    }
 
-        return comidaRepository.save(comida);
+    public void actualizarComida(Long id, ComidaRequestDto comidaRequestDto){
+
+        Comida comida = comidaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Comida no encontrada"));
+
+
+        if (nonNull(comidaRequestDto.getNombre())
+                && !comida.getNombre().equals(comidaRequestDto.getNombre())
+                && comidaRepository.findByNombre(comidaRequestDto.getNombre()).isPresent()) {
+            throw new AlreadyExistException("Ya existe una comida con ese nombre");
+        }
+
+        actualizarComida(comida, comidaRequestDto);
+        comidaRepository.save(comida);
     }
 
     public List<Comida> listarComidas() {
         return comidaRepository.findAll();
+    }
+
+    private void actualizarComida(Comida comida, ComidaRequestDto comidaRequestDto) {
+        if (nonNull(comidaRequestDto.getNombre())) comida.setNombre(comidaRequestDto.getNombre());
+        if (nonNull(comidaRequestDto.getPrecio())) comida.setPrecio(comidaRequestDto.getPrecio());
+        if (nonNull(comidaRequestDto.getTipo())) comida.setTipo(comidaRequestDto.getTipo());
+        if (nonNull(comidaRequestDto.getEsVegetariano())) comida.setEsVegetariano(comidaRequestDto.getEsVegetariano());
     }
 
     private Comida convertToEntity(ComidaRequestDto comidaRequestDto) {

@@ -19,20 +19,20 @@ public class UserController {
     UsuarioService usuarioService;
 
     @PostMapping("/")
-    public ResponseEntity<ResponseDto> register(@RequestBody UsuarioRequestDto usuario) {
+    public ResponseEntity<ResponseDto> registrarUsuario(@RequestBody UsuarioRequestDto usuario) {
         usuarioService.registrarUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDto("Usuario creado con éxito"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseDto> updateUser(@PathVariable Long id, @RequestBody UsuarioRequestDto usuario) {
+    public ResponseEntity<ResponseDto> actualizarUsuario(@PathVariable Long id, @RequestBody UsuarioRequestDto usuario) {
         usuarioService.actualizarUsuario(id, usuario);
         return ResponseEntity.ok(new ResponseDto("Usuario actualizado con éxito"));
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Usuario>> getUsers() {
+    public ResponseEntity<List<Usuario>> getUsuarios() {
         return ResponseEntity.ok(usuarioService.getUsers());
     }
 

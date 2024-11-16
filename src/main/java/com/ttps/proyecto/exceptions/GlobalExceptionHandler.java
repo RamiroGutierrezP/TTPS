@@ -1,8 +1,9 @@
 package com.ttps.proyecto.exceptions;
 
+import com.ttps.proyecto.dto.response.ResponseDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -19,8 +20,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<?> handleUserAlreadyExistException(UserAlreadyExistException e) {
+    @ExceptionHandler(AlreadyExistException.class)
+    public ResponseEntity<?> handleUserAlreadyExistException(AlreadyExistException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ResponseDto errorResponse = new ResponseDto();
+        errorResponse.setMessage(ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }
