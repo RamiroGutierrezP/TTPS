@@ -1,9 +1,7 @@
 package com.ttps.proyecto.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.ttps.proyecto.enums.TipoComida;
+import jakarta.persistence.*;
 import lombok.*;
 
 
@@ -18,6 +16,7 @@ public class Comida {
     private Long id;
     private String nombre;
     private Double precio;
-    private String tipo;
+    @Enumerated(EnumType.STRING)
+    private TipoComida tipo;
     private boolean esVegetariano;
 }

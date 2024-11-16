@@ -1,5 +1,6 @@
 package com.ttps.proyecto.dto.request;
 
+import com.ttps.proyecto.enums.TipoComida;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
@@ -19,8 +20,8 @@ public class ComidaRequestDto {
     @Positive(message = "El precio debe ser positivo")
     private Double precio;
 
-    @Size(min = 2, max = 15, message = "El tipo debe tener entre 2 y 15 caracteres")
-    private String tipo;
+    @NotNull(message = "Debes indicar el tipo de comida")
+    private TipoComida tipo;
 
     @NotNull(message = "Debes indicar si la comida es vegetariana")
     private Boolean esVegetariano;
