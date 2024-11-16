@@ -6,14 +6,11 @@ import com.ttps.proyecto.exceptions.NotFoundException;
 import com.ttps.proyecto.model.Comida;
 import com.ttps.proyecto.repository.ComidaRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Service
