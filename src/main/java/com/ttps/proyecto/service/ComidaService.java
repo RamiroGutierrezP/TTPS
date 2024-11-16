@@ -35,7 +35,6 @@ public class ComidaService {
         Comida comida = comidaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Comida no encontrada"));
 
-
         if (nonNull(comidaRequestDto.getNombre())
                 && !comida.getNombre().equals(comidaRequestDto.getNombre())
                 && comidaRepository.findByNombre(comidaRequestDto.getNombre()).isPresent()) {

@@ -27,7 +27,7 @@ public class ComidaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarComida(@PathVariable Long id, @RequestBody ComidaRequestDto comida) {
+    public ResponseEntity<ResponseDto> actualizarComida(@PathVariable Long id, @Valid @RequestBody ComidaRequestDto comida) {
         comidaService.actualizarComida(id, comida);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseDto("Comida actualizada con éxito"));
