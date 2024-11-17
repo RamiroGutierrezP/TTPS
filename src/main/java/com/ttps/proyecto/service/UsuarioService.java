@@ -1,6 +1,7 @@
 package com.ttps.proyecto.service;
 
 import com.ttps.proyecto.dto.request.UsuarioRequestDto;
+import com.ttps.proyecto.enums.TipoPersona;
 import com.ttps.proyecto.exceptions.NotFoundException;
 import com.ttps.proyecto.exceptions.AlreadyExistException;
 import com.ttps.proyecto.model.Usuario;
@@ -44,6 +45,7 @@ public class UsuarioService {
                 && usuarioRepository.findByEmail(usuarioRequestDto.getEmail()).isPresent()) {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
+        //TODO: Podríamos validar otros campos como el DNI...
 
         actualizarUsuario(usuario, usuarioRequestDto);
         usuarioRepository.save(usuario);
@@ -54,7 +56,6 @@ public class UsuarioService {
         if (nonNull(usuarioRequestDto.getApellido())) usuario.setApellido(usuarioRequestDto.getApellido());
         if (nonNull(usuarioRequestDto.getEmail())) usuario.setEmail(usuarioRequestDto.getEmail());
         if (nonNull(usuarioRequestDto.getFoto())) usuario.setFoto(usuarioRequestDto.getFoto());
-        if (nonNull(usuarioRequestDto.getRol())) usuario.setRol(usuarioRequestDto.getRol());
         if (nonNull(usuarioRequestDto.getDni())) usuario.setDni(usuarioRequestDto.getDni());
     }
 
@@ -64,7 +65,7 @@ public class UsuarioService {
         usuario.setApellido(usuarioRequestDto.getApellido());
         usuario.setEmail(usuarioRequestDto.getEmail());
         usuario.setFoto(usuarioRequestDto.getFoto());
-        usuario.setRol(usuarioRequestDto.getRol());
+        usuario.setRol(TipoPersona.USUARIO);
         usuario.setDni(usuarioRequestDto.getDni());
         return usuario;
     }

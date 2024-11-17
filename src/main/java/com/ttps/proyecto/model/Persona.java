@@ -1,5 +1,6 @@
 package com.ttps.proyecto.model;
 
+import com.ttps.proyecto.enums.TipoPersona;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,6 @@ public abstract class Persona {
     private String apellido;
     private String email;
     private String foto;
-    private String rol;
+    @Enumerated(EnumType.STRING)
+    private TipoPersona rol;
 }

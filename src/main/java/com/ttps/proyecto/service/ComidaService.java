@@ -6,7 +6,6 @@ import com.ttps.proyecto.exceptions.NotFoundException;
 import com.ttps.proyecto.model.Comida;
 import com.ttps.proyecto.repository.ComidaRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +16,11 @@ import static java.util.Objects.nonNull;
 @Transactional
 public class ComidaService {
 
-    @Autowired
-    private ComidaRepository comidaRepository;
+    private final ComidaRepository comidaRepository;
+
+    public ComidaService(ComidaRepository comidaRepository) {
+        this.comidaRepository = comidaRepository;
+    }
 
     public void crearComida(ComidaRequestDto comidaRequestDto) {
 
@@ -33,7 +35,7 @@ public class ComidaService {
     public void actualizarComida(Long id, ComidaRequestDto comidaRequestDto){
 
         Comida comida = comidaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Comida no encontrada"));
+                .orElseThrow(() -> new NotFoundException("No se encontró una comida con ID: " + id));
 
         if (nonNull(comidaRequestDto.getNombre())
                 && !comida.getNombre().equals(comidaRequestDto.getNombre())

@@ -1,58 +1,75 @@
 package com.ttps.proyecto.service;
 
 import com.ttps.proyecto.dto.request.MenuRequestDto;
+import com.ttps.proyecto.exceptions.AlreadyExistException;
+import com.ttps.proyecto.exceptions.NotFoundException;
 import com.ttps.proyecto.model.Comida;
 import com.ttps.proyecto.model.Menu;
 import com.ttps.proyecto.repository.ComidaRepository;
 import com.ttps.proyecto.repository.MenuRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @Transactional
 public class MenuService {
 
-    @Autowired
-    private MenuRepository menuRepository;
+    private final MenuRepository menuRepository;
+    private final ComidaRepository comidaRepository;
 
-    @Autowired
-    private ComidaRepository comidaRepository;
-
-    public Menu crearMenu(MenuRequestDto menu) {
-        Menu menuNuevo = convertirMenuDtoAMenu(menu);
-        return menuRepository.save(menuNuevo);
+    public MenuService(MenuRepository menuRepository, ComidaRepository comidaRepository) {
+        this.menuRepository = menuRepository;
+        this.comidaRepository = comidaRepository;
     }
 
-    public Menu actualizarMenu(Long id, MenuRequestDto menuRequestDto) {
-        Menu menu = menuRepository.findById(id).orElse(null);
+    public void crearMenu(MenuRequestDto menuRequestDto) {
 
-        if (menu == null) {
-            throw new RuntimeException("Menu no encontrado");
+        if (menuRepository.findByNombre(menuRequestDto.getNombre()).isPresent()) {
+            throw new AlreadyExistException("Ya existe un menu con ese nombre");
         }
 
-        Menu menuNuevo = convertirMenuDtoAMenu(menuRequestDto);
-        return menuRepository.save(menuNuevo);
+        Menu menu = convertirMenuDtoAMenu(menuRequestDto);
+        menuRepository.save(menu);
+    }
+
+    public void actualizarMenu(Long id, MenuRequestDto menuRequestDto) {
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No se encontró un menu con ID: " + id));
+
+        if (nonNull(menuRequestDto.getNombre())
+                && !menu.getNombre().equals(menuRequestDto.getNombre())
+                && menuRepository.findByNombre(menuRequestDto.getNombre()).isPresent()) {
+            throw new AlreadyExistException("Ya existe un menu con ese nombre");
+        }
+
+        actualizarMenu(menu, menuRequestDto);
+        menuRepository.save(menu);
     }
 
     public List<Menu> listarMenus() {
         return menuRepository.findAll();
     }
 
+    public void actualizarMenu(Menu menu, MenuRequestDto menuRequestDto){
+        if (nonNull(menuRequestDto.getNombre())) menu.setNombre(menuRequestDto.getNombre());
+        if (nonNull(menuRequestDto.getPrecioTotal())) menu.setPrecioTotal(menuRequestDto.getPrecioTotal());
+        if (nonNull(menuRequestDto.getEntradaId())) menu.setEntrada(buscarComidaPorId(menuRequestDto.getEntradaId(), "entrada"));
+        if (nonNull(menuRequestDto.getPlatoPrincipalId())) menu.setPlatoPrincipal(buscarComidaPorId(menuRequestDto.getPlatoPrincipalId(), "plato principal"));
+        if (nonNull(menuRequestDto.getPostreId())) menu.setPostre(buscarComidaPorId(menuRequestDto.getPostreId(), "postre"));
+        if (nonNull(menuRequestDto.getBebidaId())) menu.setBebida(buscarComidaPorId(menuRequestDto.getBebidaId(), "bebida"));
+        if (nonNull(menuRequestDto.getEsVegetariano())) menu.setEsVegetariano(menuRequestDto.getEsVegetariano());
+    }
+
     private Menu convertirMenuDtoAMenu(MenuRequestDto menuRequestDto) {
-        Comida entrada = comidaRepository.findById(menuRequestDto.getEntradaId())
-                .orElseThrow(() -> new IllegalArgumentException("Entrada con ID " + menuRequestDto.getEntradaId() + " no encontrada"));
 
-        Comida platoPrincipal = comidaRepository.findById(menuRequestDto.getPlatoPrincipalId())
-                .orElseThrow(() -> new IllegalArgumentException("Plato principal con ID " + menuRequestDto.getPlatoPrincipalId() + " no encontrado"));
-
-        Comida postre = comidaRepository.findById(menuRequestDto.getPostreId())
-                .orElseThrow(() -> new IllegalArgumentException("Postre con ID " + menuRequestDto.getPostreId() + " no encontrado"));
-
-        Comida bebida = comidaRepository.findById(menuRequestDto.getBebidaId())
-                .orElseThrow(() -> new IllegalArgumentException("Bebida con ID " + menuRequestDto.getBebidaId() + " no encontrada"));
+        Comida entrada = buscarComidaPorId(menuRequestDto.getEntradaId(), "entrada");
+        Comida platoPrincipal = buscarComidaPorId(menuRequestDto.getPlatoPrincipalId(), "plato principal");
+        Comida postre = buscarComidaPorId(menuRequestDto.getPostreId(), "postre");
+        Comida bebida = buscarComidaPorId(menuRequestDto.getBebidaId(), "bebida");
 
         Menu menu = new Menu();
         menu.setNombre(menuRequestDto.getNombre());
@@ -62,14 +79,12 @@ public class MenuService {
         menu.setPostre(postre);
         menu.setBebida(bebida);
         menu.setEsVegetariano(esVegetariano(entrada, platoPrincipal, postre, bebida));
+
         return menu;
     }
 
     private double calcularPrecioTotal(Comida entrada, Comida platoPrincipal, Comida postre, Comida bebida) {
-        return entrada.getPrecio()
-                + platoPrincipal.getPrecio()
-                + postre.getPrecio()
-                + bebida.getPrecio();
+        return entrada.getPrecio() + platoPrincipal.getPrecio() + postre.getPrecio() + bebida.getPrecio();
     }
 
     private boolean esVegetariano(Comida entrada, Comida platoPrincipal, Comida postre, Comida bebida) {
@@ -77,6 +92,11 @@ public class MenuService {
                 && platoPrincipal.isEsVegetariano()
                 && postre.isEsVegetariano()
                 && bebida.isEsVegetariano();
+    }
+
+    private Comida buscarComidaPorId(Long id, String tipo) {
+        return comidaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No se encontró una " + tipo + " con ID: " + id));
     }
 
 }

@@ -2,22 +2,21 @@ package com.ttps.proyecto.controller;
 
 import com.ttps.proyecto.dto.request.ComidaRequestDto;
 import com.ttps.proyecto.dto.response.ResponseDto;
-import com.ttps.proyecto.model.Comida;
 import com.ttps.proyecto.service.ComidaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/ttps/food")
 public class ComidaController {
 
-    @Autowired
-    private ComidaService comidaService;
+    private final ComidaService comidaService;
+
+    public ComidaController(ComidaService comidaService) {
+        this.comidaService = comidaService;
+    }
 
     @PostMapping("/")
     public ResponseEntity<ResponseDto> crearComida(@Valid @RequestBody ComidaRequestDto comida) {
@@ -33,8 +32,9 @@ public class ComidaController {
                 .body(new ResponseDto("Comida actualizada con éxito"));
     }
 
+    //TODO: Crear ComidaResponseDto
     @GetMapping("/")
-    public ResponseEntity<List<Comida>> listarComidas() {
+    public ResponseEntity<?> listarComidas() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(comidaService.listarComidas());
     }
