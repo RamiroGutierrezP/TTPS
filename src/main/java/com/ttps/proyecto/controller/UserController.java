@@ -29,13 +29,15 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDto> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioRequestDto usuario) {
         usuarioService.actualizarUsuario(id, usuario);
-        return ResponseEntity.ok(new ResponseDto("Usuario actualizado con éxito"));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseDto("Usuario actualizado con éxito"));
     }
 
     //TODO: Crear UsuarioResponseDto
     @GetMapping("/")
     public ResponseEntity<List<Usuario>> getUsuarios() {
-        return ResponseEntity.ok(usuarioService.getUsers());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(usuarioService.getUsers());
     }
 
     //TODO: Falta implementar el login
