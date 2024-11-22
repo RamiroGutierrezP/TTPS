@@ -32,7 +32,7 @@ public class UsuarioService {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
-        //TODO: Encodear la contraseña antes de guardarla
+        //TODO: Usar SpringSecurity para almacenar la contraseña de forma segura
         Usuario usuario = convertToEntity(usuarioRequestDto);
         usuarioRepository.save(usuario);
     }
