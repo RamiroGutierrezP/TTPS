@@ -23,4 +23,5 @@ public class UsuarioRequestDto {
     private String foto;
     @NotNull(message = "El dni es obligatorio")
     private String dni;
+    private String password;
 }

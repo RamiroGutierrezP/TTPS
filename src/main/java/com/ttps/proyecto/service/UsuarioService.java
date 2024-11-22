@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -31,7 +32,7 @@ public class UsuarioService {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
-
+        //TODO: Encodear la contraseña antes de guardarla
         Usuario usuario = convertToEntity(usuarioRequestDto);
         usuarioRepository.save(usuario);
     }
@@ -46,9 +47,15 @@ public class UsuarioService {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
-
+        //TODO: Encodear la contraseña antes de actualizarla
         actualizarUsuario(usuario, usuarioRequestDto);
         usuarioRepository.save(usuario);
+    }
+
+    public boolean isLoginSuccessful(String email, String password) {
+        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+
+        return usuario.isPresent() && usuario.get().getPassword().equals(password);
     }
 
     private void actualizarUsuario(Usuario usuario, UsuarioRequestDto usuarioRequestDto) {
@@ -67,6 +74,7 @@ public class UsuarioService {
         usuario.setFoto(usuarioRequestDto.getFoto());
         usuario.setRol(TipoPersona.USUARIO);
         usuario.setDni(usuarioRequestDto.getDni());
+        usuario.setPassword(usuarioRequestDto.getPassword());
         return usuario;
     }
 }

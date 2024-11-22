@@ -1,8 +1,10 @@
 package com.ttps.proyecto.controller;
 
+import com.ttps.proyecto.dto.request.LoginRequestDto;
 import com.ttps.proyecto.dto.request.UsuarioRequestDto;
 import com.ttps.proyecto.dto.response.ResponseDto;
 import com.ttps.proyecto.model.Usuario;
+import com.ttps.proyecto.service.TokenService;
 import com.ttps.proyecto.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class UserController {
 
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    TokenService tokenService;
 
     @PostMapping("/")
     public ResponseEntity<ResponseDto> registrarUsuario(@Valid @RequestBody UsuarioRequestDto usuario) {
@@ -40,6 +45,18 @@ public class UserController {
                 .body(usuarioService.getUsers());
     }
 
-    //TODO: Falta implementar el login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) {
+
+        if (usuarioService.isLoginSuccessful(loginRequestDto.getEmail(), loginRequestDto.getPassword())) {
+            String token = tokenService.generateToken(loginRequestDto.getEmail(), 30);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseDto(token)); //TODO: Crear LoginResponseDto
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ResponseDto("Usuario o contraseña incorrectos"));
+
+    }
 
 }

@@ -23,4 +23,5 @@ public abstract class Persona {
     private String foto;
     @Enumerated(EnumType.STRING)
     private TipoPersona rol;
+    private String password;
 }
