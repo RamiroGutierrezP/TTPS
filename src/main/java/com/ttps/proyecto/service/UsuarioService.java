@@ -6,6 +6,7 @@ import com.ttps.proyecto.exceptions.NotFoundException;
 import com.ttps.proyecto.exceptions.AlreadyExistException;
 import com.ttps.proyecto.model.Usuario;
 import com.ttps.proyecto.repository.UsuarioRepository;
+import com.ttps.proyecto.util.PasswordEncoderDecoder;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,9 @@ public class UsuarioService {
     public boolean isLoginSuccessful(String email, String password) {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
 
-        return usuario.isPresent() && usuario.get().getPassword().equals(password);
+        //TODO: Usar SpringSecurity para almacenar la contraseña de forma segura
+        return usuario.isPresent()
+                && PasswordEncoderDecoder.decodePassword(usuario.get().getPassword()).equals(password);
     }
 
     private void actualizarUsuario(Usuario usuario, UsuarioRequestDto usuarioRequestDto) {
@@ -74,7 +77,7 @@ public class UsuarioService {
         usuario.setFoto(usuarioRequestDto.getFoto());
         usuario.setRol(TipoPersona.USUARIO);
         usuario.setDni(usuarioRequestDto.getDni());
-        usuario.setPassword(usuarioRequestDto.getPassword());
+        usuario.setPassword(PasswordEncoderDecoder.encodePassword(usuarioRequestDto.getPassword()));
         return usuario;
     }
 }
