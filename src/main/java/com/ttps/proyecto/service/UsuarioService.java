@@ -32,7 +32,7 @@ public class UsuarioService {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
-
+        //TODO: Encodear la contraseña antes de guardarla
         Usuario usuario = convertToEntity(usuarioRequestDto);
         usuarioRepository.save(usuario);
     }
@@ -47,7 +47,7 @@ public class UsuarioService {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
-
+        //TODO: Encodear la contraseña antes de actualizarla
         actualizarUsuario(usuario, usuarioRequestDto);
         usuarioRepository.save(usuario);
     }
