@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -51,6 +52,12 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    public boolean isLoginSuccessful(String email, String password) {
+        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+
+        return usuario.isPresent() && usuario.get().getPassword().equals(password);
+    }
+
     private void actualizarUsuario(Usuario usuario, UsuarioRequestDto usuarioRequestDto) {
         if (nonNull(usuarioRequestDto.getNombre())) usuario.setNombre(usuarioRequestDto.getNombre());
         if (nonNull(usuarioRequestDto.getApellido())) usuario.setApellido(usuarioRequestDto.getApellido());
@@ -67,6 +74,7 @@ public class UsuarioService {
         usuario.setFoto(usuarioRequestDto.getFoto());
         usuario.setRol(TipoPersona.USUARIO);
         usuario.setDni(usuarioRequestDto.getDni());
+        usuario.setPassword(usuarioRequestDto.getPassword());
         return usuario;
     }
 }
