@@ -33,14 +33,11 @@ public class TokenService {
     }
 
     public static boolean validateToken(String token) {
-
         String prefix = "Bearer";
         try {
-
             if (token.startsWith(prefix)) {
                 token = token.substring(prefix.length()).trim();
             }
-
             Claims claims = Jwts.parser()
                     .verifyWith((SecretKey) key)
                     .build()

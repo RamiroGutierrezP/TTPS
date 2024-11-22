@@ -47,7 +47,7 @@ public class UsuarioService {
             throw new AlreadyExistException("El email ya se encuentra registrado");
         }
         //TODO: Podríamos validar otros campos como el DNI...
-        //TODO: Encodear la contraseña antes de actualizarla
+        //TODO: Usar SpringSecurity para almacenar la contraseña de forma segura
         actualizarUsuario(usuario, usuarioRequestDto);
         usuarioRepository.save(usuario);
     }
